@@ -221,9 +221,11 @@ function App() {
               placeholder="Message DispatchAI"
               className="input"
             />
-            <button onClick={() => handleSendMessage(input)}>Send</button>
-            <button onClick={isRecording ? stopRecording : startRecording}>
-              {isRecording ? 'Stop Recording' : 'Start Recording'}
+            <button class="button" onClick={() => handleSendMessage(input)}>
+              <img src="https://i.ibb.co/KbF30Sd/send-alt-2-svgrepo-com.png"/> 
+              </button>
+            <button style={{marginRight: '10px'}} class="button" onClick={isRecording ? stopRecording : startRecording}>
+              <img src={isRecording ? 'https://i.ibb.co/vZrKQTb/microphone-svgrepo-com-2.png' : 'https://i.ibb.co/p0RYNvL/microphone-svgrepo-com-1.png'}/>
             </button>
           </div>
         </div>
@@ -233,7 +235,7 @@ function App() {
           <p><strong>Description / Status:</strong> {criticalInfo.Description}</p>
           <p><strong>Type of Service:</strong> {criticalInfo.Service}</p>
           <p><strong>Situation Details:</strong> {criticalInfo.Situation}</p>
-          <button onClick={clearHistory}>Clear History</button>
+          <button class="clear" onClick={clearHistory}>Clear History</button>
         </div>
       </div>
     </div>

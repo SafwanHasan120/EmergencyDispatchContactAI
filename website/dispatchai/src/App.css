@@ -48,6 +48,7 @@ body {
   padding: 10px;
   border-radius: 5px;
   text-align: left;
+  font-family: 'Outfit', monospace;
 }
 
 .message.user {
@@ -56,14 +57,15 @@ body {
 }
 
 .message.ai {
-  background-color: #45A29E;
+  background-color: #66FCF1;
+  color: BLACK;
 }
 
 .input-container {
   display: flex;
-  padding: 10px;
   background-color: #1F2833;
-  border-top: 1px solid #66FCF1;
+  border-top: 3px solid #66FCF1;
+  border-radius: 5px;
 }
 
 .input {
@@ -99,6 +101,7 @@ button {
 .info-box {
   flex: 1;
   border: 3px solid #66FCF1;
+  font-family: 'Outfit', monospace;
   border-radius: 10px;
   padding: 20px;
   text-align: left;
@@ -108,4 +111,34 @@ button {
   font-size: 12px;
   padding: 5px 10px;
   margin-top: 5px;
+}
+
+.button{
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button img{
+  width: 35px;
+  height: 35px;
+  transition: transform 0.2s ease;
+}
+
+.clear{
+  border: #66FCF1, solid, 3px;
+  border-radius: 5px;
+  background-color: black;
+  font-family: 'Outfit', monospace;
+  color: #66FCF1;
+  margin: 0;
+}
+
+.clear:hover{
+  color: black;
+  background-color: #66FCF1;
 }
