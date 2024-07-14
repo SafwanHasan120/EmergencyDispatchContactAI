@@ -56,10 +56,10 @@ def get_ai_response(messages):
 
 def extract_information(response_text):
     patterns = {
-        'Location': r'- Location: (.*?)\n',
-        'Description / Status of Individuals': r'- Description / Status of Individuals: (.*?)\n',
-        'Type of Service': r'- Type of Service: (.*?)\n',
-        'Situation Details': r'- Situation Details: (.*?)\n',
+        'Location': r'Location: (.*?)\n',
+        'Description / Status of Individuals': r'Description / Status of Individuals: (.*?)\n',
+        'Type of Service': r'Type of Service: (.*?)\n',
+        'Situation Details': r'Situation Details: (.*?)\n',
         'Outputted Message to Caller': r'Outputted Message to Caller: (.*?)$'
     }
     extracted_info = {}
@@ -106,6 +106,8 @@ def text_to_speech(text):
     return filename
 
 
+# In AI.py
+
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
     if request.method == "OPTIONS":
@@ -113,23 +115,20 @@ def chat():
     elif request.method == "POST":
         data = request.json
         user_message = data.get('message', '')
+        conversation = data.get('conversation', [])
 
-        # Retrieve the conversation history from the session
-        conversation = session.get('conversation', [])
-
-        # Add the system message if the conversation is empty (first message)
+        # If the conversation is empty, add the system prompt
         if not conversation:
-            conversation.append({"role": "system", "content": system_prompt})
+            conversation = [{"role": "system", "content": system_prompt}]
 
+        # Add the new user message to the conversation
         conversation.append({"role": "user", "content": user_message})
 
         ai_response = get_ai_response(conversation)
         extracted_info = extract_information(ai_response)
 
+        # Add the AI's response to the conversation
         conversation.append({"role": "assistant", "content": ai_response})
-
-        # Save the updated conversation in the session
-        session['conversation'] = conversation
 
         # Generate speech for AI response
         speech_file = text_to_speech(extracted_info['Outputted Message to Caller'])
@@ -178,6 +177,16 @@ def handle_speech_to_text():
         text = speech_to_text(audio_file)
 
         return _corsify_actual_response(jsonify({'text': text}))
+
+@app.route('/api/system-prompt', methods=['GET'])
+def get_system_prompt():
+    try:
+        with open(SYSTEM_PROMPT_PATH, 'r') as file:
+            prompt = file.read()
+        return jsonify({"prompt": prompt})
+    except Exception as e:
+        print(f"Error reading system prompt: {e}")
+        return jsonify({"error": "Failed to read system prompt"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

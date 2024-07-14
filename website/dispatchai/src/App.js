@@ -3,6 +3,7 @@ import './App.css';
 
 function App() {
   const [messages, setMessages] = useState([]);
+  const [conversation, setConversation] = useState([]);
   const [input, setInput] = useState('');
   const [criticalInfo, setCriticalInfo] = useState({
     Location: 'Unknown',
@@ -16,14 +17,30 @@ function App() {
 
   useEffect(() => {
     audioRef.current = new Audio();
+
+    // Fetch the system prompt from the server
+    fetch('http://127.0.0.1:5000/api/system-prompt')
+      .then(response => response.json())
+      .then(data => {
+        setConversation([{ role: 'system', content: data.prompt }]);
+      })
+      .catch(error => {
+        console.error('Error fetching system prompt:', error);
+        setConversation([{ role: 'system', content: 'You are a 911 call responder...' }]);
+      });
   }, []);
 
   const handleSendMessage = async (message) => {
     if (message.trim() === '') return;
 
+    // Update messages state for UI
     const newMessages = [...messages, { sender: 'user', text: message }];
     setMessages(newMessages);
     setInput('');
+
+    // Update conversation state for API
+    const newConversation = [...conversation, { role: 'user', content: message }];
+    setConversation(newConversation);
 
     try {
       console.log('Sending request to server...');
@@ -35,10 +52,7 @@ function App() {
         },
         body: JSON.stringify({
           message: message,
-          conversation: newMessages.map(m => ({
-            role: m.sender === 'user' ? 'user' : 'assistant',
-            content: m.text
-          }))
+          conversation: newConversation
         }),
       });
 
@@ -51,26 +65,42 @@ function App() {
       const data = await response.json();
       console.log('Data received:', data);
 
-      setMessages([...newMessages, { sender: 'ai', text: data.message, speechFile: data.speechFile }]);
+      // Update messages state for UI
+      setMessages(prevMessages => [...prevMessages, { sender: 'ai', text: data.message, speechFile: data.speechFile }]);
+
+      // Update conversation state for API
+      setConversation(prevConversation => [...prevConversation, { role: 'assistant', content: data.message }]);
+
       setCriticalInfo(data.criticalInfo);
 
       // Play the AI's response
       playAudio(data.speechFile);
     } catch (error) {
       console.error('Error:', error);
-      setMessages([...newMessages, { sender: 'ai', text: 'Sorry, there was an error processing your request.' }]);
+      setMessages(prevMessages => [...prevMessages, { sender: 'ai', text: 'Sorry, there was an error processing your request.' }]);
     }
   };
 
-  const clearHistory = () => {
-    setMessages([]);
-    setCriticalInfo({
-      Location: 'Unknown',
-      Description: 'Unknown',
-      Service: 'Unknown',
-      Situation: 'Unknown'
-    });
-  };
+    const clearHistory = async () => {
+      setMessages([]);
+
+      fetch('http://127.0.0.1:5000/api/system-prompt')
+      .then(response => response.json())
+      .then(data => {
+        setConversation([{ role: 'system', content: data.prompt }]);
+      })
+      .catch(error => {
+        console.error('Error fetching system prompt:', error);
+        setConversation([{ role: 'system', content: 'You are a 911 call responder...' }]);
+      });
+
+      setCriticalInfo({
+        Location: 'Unknown',
+        Description: 'Unknown',
+        Service: 'Unknown',
+        Situation: 'Unknown'
+      });
+    };
 
   const startRecording = () => {
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -209,7 +239,7 @@ function App() {
               <div key={index} className={`message ${message.sender}`}>
                 {message.text}
                 {message.sender === 'ai' && message.speechFile && (
-                  <button onClick={() => playAudio(message.speechFile)}>Play Audio</button>
+                  <button class="button" onClick={() => playAudio(message.speechFile)}>Play Audio</button>
                 )}
               </div>
             ))}
@@ -221,11 +251,11 @@ function App() {
               placeholder="Message DispatchAI"
               className="input"
             />
-            <button class="button" onClick={() => handleSendMessage(input)}>
-              <img src="https://i.ibb.co/KbF30Sd/send-alt-2-svgrepo-com.png"/> 
-              </button>
-            <button style={{marginRight: '10px'}} class="button" onClick={isRecording ? stopRecording : startRecording}>
-              <img src={isRecording ? 'https://i.ibb.co/vZrKQTb/microphone-svgrepo-com-2.png' : 'https://i.ibb.co/p0RYNvL/microphone-svgrepo-com-1.png'}/>
+            <button className="button" onClick={() => handleSendMessage(input)}>
+              <img src="https://i.ibb.co/KbF30Sd/send-alt-2-svgrepo-com.png" alt="Send"/>
+            </button>
+            <button style={{marginRight: '10px'}} className="button" onClick={isRecording ? stopRecording : startRecording}>
+              <img src={isRecording ? 'https://i.ibb.co/vZrKQTb/microphone-svgrepo-com-2.png' : 'https://i.ibb.co/p0RYNvL/microphone-svgrepo-com-1.png'} alt="Record"/>
             </button>
           </div>
         </div>
@@ -235,7 +265,7 @@ function App() {
           <p><strong>Description / Status:</strong> {criticalInfo.Description}</p>
           <p><strong>Type of Service:</strong> {criticalInfo.Service}</p>
           <p><strong>Situation Details:</strong> {criticalInfo.Situation}</p>
-          <button class="clear" onClick={clearHistory}>Clear History</button>
+          <button className="clear" onClick={clearHistory}>Clear History</button>
         </div>
       </div>
     </div>
