@@ -19,7 +19,7 @@ function App() {
     audioRef.current = new Audio();
 
     // Fetch the system prompt from the server
-    fetch('http://127.0.0.1:5000/api/system-prompt')
+    fetch('https://api-ai-911-dispatch-system-2e828cac3d00.herokuapp.com/api/system-prompt')
       .then(response => response.json())
       .then(data => {
         setConversation([{ role: 'system', content: data.prompt }]);
@@ -44,7 +44,7 @@ function App() {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('http://127.0.0.1:5000/api/chat', {
+      const response = await fetch('https://api-ai-911-dispatch-system-2e828cac3d00.herokuapp.com/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ function App() {
     const clearHistory = async () => {
       setMessages([]);
 
-      fetch('http://127.0.0.1:5000/api/system-prompt')
+      fetch('https://api-ai-911-dispatch-system-2e828cac3d00.herokuapp.com/api/system-prompt')
       .then(response => response.json())
       .then(data => {
         setConversation([{ role: 'system', content: data.prompt }]);
@@ -136,7 +136,7 @@ function App() {
     formData.append('audio', wavBlob, 'recording.wav');
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/speech-to-text', {
+      const response = await fetch('https://api-ai-911-dispatch-system-2e828cac3d00.herokuapp.com/api/speech-to-text', {
         method: 'POST',
         body: formData,
       });
@@ -225,7 +225,7 @@ function App() {
   };
 
   const playAudio = (speechFile) => {
-    audioRef.current.src = `http://127.0.0.1:5000/api/audio/${speechFile}`;
+    audioRef.current.src = `https://api-ai-911-dispatch-system-2e828cac3d00.herokuapp.com/api/audio/${speechFile}`;
     audioRef.current.play().catch(e => console.error("Error playing audio:", e));
   };
 
