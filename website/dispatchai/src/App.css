@@ -94,7 +94,15 @@ body {
 
 .widget a {
   color: #66FCF1;
-  opacity: 50%;
   text-decoration: none;
   font-size: 18px;
+}
+
+.widget:hover{
+  color: white;
+  background-color: #66FCF1;
+}
+
+.widget a:hover{
+  color: black;
 }
