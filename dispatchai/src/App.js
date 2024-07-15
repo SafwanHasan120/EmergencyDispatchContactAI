@@ -229,6 +229,26 @@ function App() {
     audioRef.current.play().catch(e => console.error("Error playing audio:", e));
   };
 
+  const inputRef = useRef(null);
+  useEffect(() => {
+    const input = inputRef.current;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        handleSendMessage(input.value);
+      }
+    };
+    
+    if (input) {
+      input.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      if (input) {
+        input.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+  }, []);
+
   return (
     <div className="container">
       <h1 className="title">9-1-1 Assistant</h1>
@@ -246,12 +266,13 @@ function App() {
           </div>
           <div className="input-container">
             <textarea
+              ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Message 9-1-1 Assistant"
               className="input"
             />
-            <button className="button" onClick={() => handleSendMessage(input)}>
+            <button className="button" onClick={() => handleSendMessage(inputRef.current.value)}>
               <img src="https://i.ibb.co/KbF30Sd/send-alt-2-svgrepo-com.png" alt="Send"/>
             </button>
             <button style={{marginRight: '10px'}} className="button" onClick={isRecording ? stopRecording : startRecording}>
