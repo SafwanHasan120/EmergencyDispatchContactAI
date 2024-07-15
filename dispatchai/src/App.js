@@ -231,7 +231,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1 className="title">DispatchAI</h1>
+      <h1 className="title">9-1-1 Assistant</h1>
       <div className="content">
         <div className="chat-box">
           <div className="chat-messages">
