@@ -248,7 +248,7 @@ function App() {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Message DispatchAI"
+              placeholder="Message 9-1-1 Assistant"
               className="input"
             />
             <button className="button" onClick={() => handleSendMessage(input)}>
